@@ -12,11 +12,13 @@ import { GISPage } from './pages/GISPage';
 import { SimulationPage } from './pages/SimulationPage';
 import { IoTMonitoringPage } from './pages/IoTMonitoringPage';
 import { RecommendationsPage } from './pages/RecommendationsPage';
+import { OfflineStatusIndicator, OfflineBanner } from './components/offline/OfflineStatusIndicator';
 
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <OfflineBanner />
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
@@ -104,6 +106,7 @@ function App() {
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
+        <OfflineStatusIndicator />
       </BrowserRouter>
     </AuthProvider>
   );
