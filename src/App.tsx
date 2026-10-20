@@ -8,6 +8,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { InventoryPage } from './pages/InventoryPage';
+import { GISPage } from './pages/GISPage';
 
 function App() {
   return (
@@ -37,6 +38,16 @@ function App() {
                     <InventoryPage />
                   </div>
                 </div>
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* GIS routes - require routes:read permission */}
+          <Route
+            path="/gis"
+            element={
+              <ProtectedRoute requiredPermission="routes:read">
+                <GISPage />
               </ProtectedRoute>
             }
           />

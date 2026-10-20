@@ -121,23 +121,26 @@ class Route(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     - code: Short unique identifier
     - origin_depot_id: Starting depot
     - destination_depot_id: Ending depot
-    - status: Route status
-    - distance_km: Total distance in kilometers
-    - estimated_duration_hours: Estimated travel time
+    - route_type: Type of route (primary, alternative, emergency)
+    - status: Route status (planned, active, completed, cancelled, disrupted)
+    - distance_km: Total distance in kilometers (calculated, nullable)
+    - estimated_duration_hours: Estimated travel time (calculated, nullable)
     - optimization_objective: What the route optimizes for
     - waypoint_data: JSON array of intermediate stops
+    - route_data: JSON object with full route calculation data
     - vehicle_type: Type of vehicle for this route
     - max_weight_kg: Maximum weight capacity
     - max_volume_m3: Maximum volume capacity
     - cost_per_km: Cost per kilometer
     - carbon_emission_factor: CO2 emissions per km
+    - disruption_reason: Reason for disruption (if disrupted)
+    - disruption_severity: Severity of disruption
+    - disruption_estimated_resolution: Estimated hours to resolve
     """
 
     __tablename__ = "routes"
 
     __table_args__ = (
-        CheckConstraint("distance_km > 0", name="ck_routes_distance_positive"),
-        CheckConstraint("estimated_duration_hours > 0", name="ck_routes_duration_positive"),
         CheckConstraint("max_weight_kg > 0", name="ck_routes_max_weight_positive"),
         CheckConstraint("max_volume_m3 > 0", name="ck_routes_max_volume_positive"),
         CheckConstraint("cost_per_km >= 0", name="ck_routes_cost_non_negative"),
@@ -158,16 +161,21 @@ class Route(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         nullable=False,
         index=True,
     )
+    route_type: Mapped[str] = mapped_column(String(30), nullable=False, default="primary", index=True)
     status: Mapped[str] = mapped_column(String(30), nullable=False, default="planned", index=True)
-    distance_km: Mapped[float] = mapped_column(Float, nullable=False)
-    estimated_duration_hours: Mapped[float] = mapped_column(Float, nullable=False)
+    distance_km: Mapped[float | None] = mapped_column(Float, nullable=True, comment="Calculated distance")
+    estimated_duration_hours: Mapped[float | None] = mapped_column(Float, nullable=True, comment="Calculated duration")
     optimization_objective: Mapped[str] = mapped_column(String(50), nullable=False, default="balanced")
     waypoint_data: Mapped[str | None] = mapped_column(Text, nullable=True, comment="JSON array of waypoints")
+    route_data: Mapped[str | None] = mapped_column(Text, nullable=True, comment="JSON object with full route calculation")
     vehicle_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     max_weight_kg: Mapped[float] = mapped_column(Float, nullable=False, default=10000.0)
     max_volume_m3: Mapped[float] = mapped_column(Float, nullable=False, default=50.0)
     cost_per_km: Mapped[float] = mapped_column(Float, nullable=False, default=0.0)
     carbon_emission_factor: Mapped[float] = mapped_column(Float, nullable=False, default=0.0, comment="kg CO2 per km")
+    disruption_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    disruption_severity: Mapped[str | None] = mapped_column(String(20), nullable=True)
+    disruption_estimated_resolution: Mapped[float | None] = mapped_column(Float, nullable=True, comment="Hours to resolve")
 
     # Relationships
     shipments: Mapped[list["Shipment"]] = relationship(
