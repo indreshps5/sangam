@@ -9,6 +9,7 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { InventoryPage } from './pages/InventoryPage';
 import { GISPage } from './pages/GISPage';
+import { SimulationPage } from './pages/SimulationPage';
 
 function App() {
   return (
@@ -48,6 +49,16 @@ function App() {
             element={
               <ProtectedRoute requiredPermission="routes:read">
                 <GISPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Simulation routes - require simulation:execute permission */}
+          <Route
+            path="/simulation"
+            element={
+              <ProtectedRoute requiredPermission="simulation:execute">
+                <SimulationPage />
               </ProtectedRoute>
             }
           />
