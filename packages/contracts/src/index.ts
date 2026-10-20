@@ -1,11 +1,15 @@
 /**
  * SANGAM Shared API Contracts
- * Single source of truth for types shared between frontend and backend.
+ * Canonical entity types matching backend Pydantic schemas.
+ * Single source of truth for frontend-backend type alignment.
  */
 
-// Re-export all types
-export * from './types/shipments';
-export * from './types/warehouses';
-export * from './types/forecasts';
 export * from './types/common';
-export * from './constants';
+export * from './types/depots';
+export * from './types/inventory';
+export * from './types/shipments';
+export * from './types/routes';
+export * from './types/forecasts';
+export * from './types/sensors';
+export * from './types/entities';
+export * from './types/enums';

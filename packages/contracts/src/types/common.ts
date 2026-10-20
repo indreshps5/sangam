@@ -1,5 +1,5 @@
 /**
- * Common types used across the SANGAM platform.
+ * Common types shared across all entities.
  */
 
 export interface PaginatedResponse<T> {
@@ -14,7 +14,7 @@ export interface ApiError {
   title: string;
   status: number;
   detail: string;
-  instance: string;
+  instance?: string;
   [key: string]: unknown;
 }
 
