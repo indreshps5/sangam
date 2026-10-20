@@ -42,7 +42,12 @@ class Settings(BaseSettings):
 
     # Security
     secret_key: str = "change-me-in-production"
-    access_token_expire_minutes: int = 30
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30  # Short-lived access tokens
+    refresh_token_expire_days: int = 7  # Longer-lived refresh tokens
+    
+    # Development seed users (only used in development environment)
+    dev_seed_users: str = ""  # JSON array of seed users, e.g., [{"email":"...","password":"...","roles":["admin"]}]
 
     # ML Service
     ml_service_url: str = "http://localhost:8001"
