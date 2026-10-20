@@ -17,6 +17,7 @@ from sangam_api.shipments.router import router as shipments_router
 from sangam_api.routes.router import router as routes_router
 from sangam_api.simulation.router import router as simulation_router
 from sangam_api.iot.router import router as iot_router
+from sangam_api.recommendations.router import router as recommendations_router
 
 api_router = APIRouter()
 
@@ -31,3 +32,4 @@ api_router.include_router(inventory_router)
 api_router.include_router(forecasting_router, tags=["forecasting"])
 api_router.include_router(simulation_router)  # What-if simulation module
 api_router.include_router(iot_router)  # IoT sensor monitoring module
+api_router.include_router(recommendations_router)  # Recommendations module

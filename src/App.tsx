@@ -11,6 +11,7 @@ import { InventoryPage } from './pages/InventoryPage';
 import { GISPage } from './pages/GISPage';
 import { SimulationPage } from './pages/SimulationPage';
 import { IoTMonitoringPage } from './pages/IoTMonitoringPage';
+import { RecommendationsPage } from './pages/RecommendationsPage';
 
 function App() {
   return (
@@ -70,6 +71,16 @@ function App() {
             element={
               <ProtectedRoute requiredPermission="iot:read">
                 <IoTMonitoringPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Recommendations routes - require recommendations:read permission */}
+          <Route
+            path="/recommendations"
+            element={
+              <ProtectedRoute requiredPermission="recommendations:read">
+                <RecommendationsPage />
               </ProtectedRoute>
             }
           />
