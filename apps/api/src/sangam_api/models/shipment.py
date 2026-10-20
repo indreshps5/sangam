@@ -22,9 +22,11 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     - origin_depot_id: FK to origin depot
     - destination_depot_id: FK to destination depot
     - route_id: Optional FK to assigned route
+    - inventory_item_id: Optional FK to inventory item (commodity)
     - status: Current shipment status
     - weight_kg: Total weight in kilograms
     - volume_m3: Total volume in cubic meters
+    - quantity: Number of units (if tracking by count)
     - priority: Priority level (1=critical, 5=minimal)
     - shipment_type: Type of shipment (standard, express, etc.)
     - carrier_name: Name of the carrier
@@ -33,6 +35,10 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     - actual_departure: Actual departure time
     - estimated_arrival: Planned arrival time
     - actual_arrival: Actual arrival time
+    - status_history: JSON array of status changes with timestamps
+    - current_location: JSON object with lat/lng for GPS simulation
+    - delay_reason: Reason for delay (if delayed)
+    - idempotency_key: Unique key for idempotent operations
     - notes: Additional information
     """
 
@@ -42,6 +48,7 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         CheckConstraint("weight_kg > 0", name="ck_shipments_weight_positive"),
         CheckConstraint("volume_m3 > 0", name="ck_shipments_volume_positive"),
         CheckConstraint("priority >= 1 AND priority <= 5", name="ck_shipments_priority_range"),
+        CheckConstraint("quantity > 0", name="ck_shipments_quantity_positive"),
     )
 
     origin_depot_id: Mapped[UUID] = mapped_column(
@@ -62,9 +69,16 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         nullable=True,
         index=True,
     )
-    status: Mapped[str] = mapped_column(String(50), nullable=False, default="pending", index=True)
+    inventory_item_id: Mapped[UUID | None] = mapped_column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("inventory_items.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    status: Mapped[str] = mapped_column(String(50), nullable=False, default="planned", index=True)
     weight_kg: Mapped[float] = mapped_column(Float, nullable=False)
     volume_m3: Mapped[float] = mapped_column(Float, nullable=False)
+    quantity: Mapped[float] = mapped_column(Float, nullable=False, default=1.0)
     priority: Mapped[int] = mapped_column(Integer, nullable=False, default=3)
     shipment_type: Mapped[str] = mapped_column(String(50), nullable=False, default="standard")
     carrier_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
@@ -73,6 +87,10 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     actual_departure: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     estimated_arrival: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     actual_arrival: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    status_history: Mapped[str | None] = mapped_column(Text, nullable=True, comment="JSON array of status changes")
+    current_location: Mapped[str | None] = mapped_column(Text, nullable=True, comment="JSON object with lat/lng")
+    delay_reason: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    idempotency_key: Mapped[str | None] = mapped_column(String(100), nullable=True, unique=True, index=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Relationships
@@ -88,6 +106,9 @@ class Shipment(Base, UUIDPrimaryKeyMixin, TimestampMixin):
     )
     route: Mapped["Route | None"] = relationship(
         back_populates="shipments", lazy="joined"
+    )
+    inventory_item: Mapped["InventoryItem | None"] = relationship(
+        lazy="joined"
     )
 
 

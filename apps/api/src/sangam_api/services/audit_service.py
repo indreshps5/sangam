@@ -143,6 +143,73 @@ class AuditService:
             metadata={"required_permission": required_permission},
         )
     
+    async def log_shipment_created(
+        self,
+        shipment_id: UUID,
+        user_id: Optional[UUID] = None,
+        origin_depot_id: Optional[UUID] = None,
+        destination_depot_id: Optional[UUID] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> AuditLog:
+        """Log shipment creation."""
+        return await self.log_action(
+            action="shipment_created",
+            entity_type="shipment",
+            user_id=user_id,
+            entity_id=shipment_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            metadata={
+                "origin_depot_id": str(origin_depot_id) if origin_depot_id else None,
+                "destination_depot_id": str(destination_depot_id) if destination_depot_id else None
+            }
+        )
+    
+    async def log_shipment_updated(
+        self,
+        shipment_id: UUID,
+        user_id: Optional[UUID] = None,
+        changes: Optional[dict] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> AuditLog:
+        """Log shipment update."""
+        return await self.log_action(
+            action="shipment_updated",
+            entity_type="shipment",
+            user_id=user_id,
+            entity_id=shipment_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            changes=changes
+        )
+    
+    async def log_shipment_status_changed(
+        self,
+        shipment_id: UUID,
+        user_id: Optional[UUID] = None,
+        old_status: Optional[str] = None,
+        new_status: Optional[str] = None,
+        notes: Optional[str] = None,
+        ip_address: Optional[str] = None,
+        user_agent: Optional[str] = None,
+    ) -> AuditLog:
+        """Log shipment status change."""
+        return await self.log_action(
+            action="shipment_status_changed",
+            entity_type="shipment",
+            user_id=user_id,
+            entity_id=shipment_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            metadata={
+                "old_status": old_status,
+                "new_status": new_status,
+                "notes": notes
+            }
+        )
+    
     async def get_recent_logs(
         self,
         user_id: Optional[UUID] = None,
