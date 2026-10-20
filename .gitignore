@@ -1,5 +1,57 @@
+# Dependencies
 node_modules/
-.next/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+env/
+
+# Build output
 dist/
 build/
+*.egg-info/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+.mypy_cache/
+
+# Logs
 *.log
+logs/
+
+# Database
+*.sqlite3
+*.db
+
+# ML artifacts
+ml/artifacts/
+ml/models/*.pkl
+ml/models/*.h5
+ml/models/*.onnx
+
+# Docker
+.docker/
+
+# Misc
+*.tgz
+.cache/
+.next/

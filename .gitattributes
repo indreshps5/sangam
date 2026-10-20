@@ -1,0 +1,61 @@
+# Auto-detect text files and normalize to CRLF
+* text=auto eol=crlf
+
+# Explicitly mark text source files as CRLF
+# Frontend
+*.ts text eol=crlf
+*.tsx text eol=crlf
+*.js text eol=crlf
+*.jsx text eol=crlf
+*.css text eol=crlf
+*.html text eol=crlf
+*.json text eol=crlf
+*.md text eol=crlf
+
+# Backend
+*.py text eol=crlf
+*.toml text eol=crlf
+*.cfg text eol=crlf
+*.ini text eol=crlf
+
+# Infrastructure
+*.sql text eol=crlf
+*.yml text eol=crlf
+*.yaml text eol=crlf
+*.env text eol=crlf
+*.env.* text eol=crlf
+Dockerfile* text eol=crlf
+Makefile text eol=crlf
+
+# Contracts and specs
+*.proto text eol=crlf
+*.graphql text eol=crlf
+
+# ML
+*.ipynb text eol=crlf
+
+# Editor and project config
+.editorconfig text eol=crlf
+.gitattributes text eol=lf
+.gitignore text eol=crlf
+.prettierrc text eol=crlf
+.eslintrc* text eol=crlf
+tsconfig*.json text eol=crlf
+
+# Binary files - do not normalize
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.pdf binary
+*.zip binary
+*.tar.gz binary
+*.pyc binary
+*.pyo binary
+__pycache__/** binary
