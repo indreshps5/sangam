@@ -11,6 +11,7 @@ from sangam_api.api.routes.admin import router as admin_router
 from sangam_api.api.routes.depots import router as depots_router
 from sangam_api.api.routes.shipments import router as shipments_router
 from sangam_api.api.routes.forecasts import router as forecasts_router
+from sangam_api.inventory.router import router as inventory_router
 
 api_router = APIRouter()
 
@@ -20,3 +21,4 @@ api_router.include_router(admin_router)
 api_router.include_router(depots_router, prefix="/depots", tags=["depots"])
 api_router.include_router(shipments_router, prefix="/shipments", tags=["shipments"])
 api_router.include_router(forecasts_router, prefix="/forecasts", tags=["forecasts"])
+api_router.include_router(inventory_router)

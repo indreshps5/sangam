@@ -7,6 +7,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
+import { InventoryPage } from './pages/InventoryPage';
 
 function App() {
   return (
@@ -22,6 +23,20 @@ function App() {
             element={
               <ProtectedRoute>
                 <DashboardPage />
+              </ProtectedRoute>
+            }
+          />
+          
+          {/* Inventory routes - require inventory:read permission */}
+          <Route
+            path="/inventory"
+            element={
+              <ProtectedRoute requiredPermission="inventory:read">
+                <div className="min-h-screen bg-slate-900">
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                    <InventoryPage />
+                  </div>
+                </div>
               </ProtectedRoute>
             }
           />

@@ -40,6 +40,7 @@ from sangam_api.core.logging import get_logger
 from sangam_api.models.user import User, Role
 from sangam_api.models.depot import Depot
 from sangam_api.models.shipment import Shipment, Route
+from sangam_api.inventory.models import InventoryItem, InventoryTransaction
 from sangam_api.config import get_settings
 
 logger = get_logger(__name__)
@@ -229,6 +230,233 @@ async def create_sample_depots():
         logger.info("Sample depots created successfully")
 
 
+async def create_sample_inventory():
+    """Create sample inventory items and transactions."""
+    async with async_session_factory() as session:
+        # Check if inventory items already exist
+        result = await session.execute(select(InventoryItem).limit(1))
+        if result.scalar_one_or_none():
+            logger.info("Inventory items already exist, skipping")
+            return
+        
+        # Get depots
+        depots_result = await session.execute(select(Depot))
+        depots = depots_result.scalars().all()
+        
+        if not depots:
+            logger.warning("No depots found, skipping inventory seeding")
+            return
+        
+        # Sample inventory items for each depot
+        inventory_items = [
+            # Mumbai Warehouse
+            {
+                "depot_id": depots[0].id,
+                "name": "Electronics - Smartphones",
+                "sku": "ELEC-SMART-001",
+                "category": "Electronics",
+                "description": "Latest generation smartphones",
+                "unit_of_measure": "units",
+                "quantity_on_hand": 1250.0,
+                "quantity_reserved": 150.0,
+                "min_stock_level": 200.0,
+                "max_stock_level": 2000.0,
+                "unit_cost": 450.0,
+                "currency": "USD",
+                "location_code": "A-01-03",
+            },
+            {
+                "depot_id": depots[0].id,
+                "name": "Electronics - Laptops",
+                "sku": "ELEC-LAPTOP-001",
+                "category": "Electronics",
+                "description": "Business laptops",
+                "unit_of_measure": "units",
+                "quantity_on_hand": 380.0,
+                "quantity_reserved": 45.0,
+                "min_stock_level": 100.0,
+                "max_stock_level": 800.0,
+                "unit_cost": 850.0,
+                "currency": "USD",
+                "location_code": "A-02-01",
+            },
+            {
+                "depot_id": depots[0].id,
+                "name": "Packaging Materials - Boxes",
+                "sku": "PKG-BOX-001",
+                "category": "Packaging",
+                "description": "Standard shipping boxes",
+                "unit_of_measure": "units",
+                "quantity_on_hand": 5000.0,
+                "quantity_reserved": 500.0,
+                "min_stock_level": 1000.0,
+                "max_stock_level": 10000.0,
+                "unit_cost": 2.5,
+                "currency": "USD",
+                "location_code": "B-05-02",
+            },
+            # Delhi Distribution Center
+            {
+                "depot_id": depots[1].id,
+                "name": "Consumer Goods - Beverages",
+                "sku": "CONS-BEV-001",
+                "category": "Consumer Goods",
+                "description": "Bottled water (1L)",
+                "unit_of_measure": "units",
+                "quantity_on_hand": 8500.0,
+                "quantity_reserved": 1200.0,
+                "min_stock_level": 2000.0,
+                "max_stock_level": 15000.0,
+                "unit_cost": 0.5,
+                "currency": "USD",
+                "location_code": "C-01-01",
+            },
+            {
+                "depot_id": depots[1].id,
+                "name": "Consumer Goods - Snacks",
+                "sku": "CONS-SNACK-001",
+                "category": "Consumer Goods",
+                "description": "Packaged snacks",
+                "unit_of_measure": "units",
+                "quantity_on_hand": 3200.0,
+                "quantity_reserved": 400.0,
+                "min_stock_level": 800.0,
+                "max_stock_level": 6000.0,
+                "unit_cost": 1.2,
+                "currency": "USD",
+                "location_code": "C-02-03",
+            },
+            {
+                "depot_id": depots[1].id,
+                "name": "Office Supplies - Paper",
+                "sku": "OFF-PAPER-001",
+                "category": "Office Supplies",
+                "description": "A4 paper (500 sheets)",
+                "unit_of_measure": "reams",
+                "quantity_on_hand": 150.0,
+                "quantity_reserved": 20.0,
+                "min_stock_level": 50.0,
+                "max_stock_level": 500.0,
+                "unit_cost": 5.0,
+                "currency": "USD",
+                "location_code": "D-03-01",
+            },
+            # Bangalore Cold Storage
+            {
+                "depot_id": depots[2].id,
+                "name": "Perishables - Dairy Products",
+                "sku": "PERISH-DAIRY-001",
+                "category": "Perishables",
+                "description": "Milk and dairy products",
+                "unit_of_measure": "liters",
+                "quantity_on_hand": 2500.0,
+                "quantity_reserved": 300.0,
+                "min_stock_level": 500.0,
+                "max_stock_level": 5000.0,
+                "unit_cost": 1.5,
+                "currency": "USD",
+                "location_code": "CS-01-01",
+            },
+            {
+                "depot_id": depots[2].id,
+                "name": "Perishables - Frozen Foods",
+                "sku": "PERISH-FROZEN-001",
+                "category": "Perishables",
+                "description": "Frozen vegetables and meals",
+                "unit_of_measure": "kg",
+                "quantity_on_hand": 1800.0,
+                "quantity_reserved": 250.0,
+                "min_stock_level": 400.0,
+                "max_stock_level": 3000.0,
+                "unit_cost": 3.5,
+                "currency": "USD",
+                "location_code": "CS-02-01",
+            },
+            {
+                "depot_id": depots[2].id,
+                "name": "Perishables - Fresh Produce",
+                "sku": "PERISH-PRODUCE-001",
+                "category": "Perishables",
+                "description": "Fresh fruits and vegetables",
+                "unit_of_measure": "kg",
+                "quantity_on_hand": 85.0,  # Low stock example
+                "quantity_reserved": 10.0,
+                "min_stock_level": 200.0,
+                "max_stock_level": 1000.0,
+                "unit_cost": 2.0,
+                "currency": "USD",
+                "location_code": "CS-03-01",
+            },
+        ]
+        
+        created_items = []
+        for item_data in inventory_items:
+            item = InventoryItem(
+                id=uuid4(),
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+                **item_data,
+            )
+            session.add(item)
+            created_items.append(item)
+            logger.info(f"Created inventory item: {item_data['name']}")
+        
+        await session.flush()
+        
+        # Create sample transactions
+        transactions = [
+            {
+                "inventory_item_id": created_items[0].id,
+                "depot_id": created_items[0].depot_id,
+                "transaction_type": "receipt",
+                "quantity": 500.0,
+                "unit_of_measure": "units",
+                "notes": "Initial stock receipt",
+                "performed_at": datetime.now(timezone.utc),
+            },
+            {
+                "inventory_item_id": created_items[0].id,
+                "depot_id": created_items[0].depot_id,
+                "transaction_type": "shipment",
+                "quantity": -150.0,
+                "unit_of_measure": "units",
+                "notes": "Shipped to Delhi DC",
+                "performed_at": datetime.now(timezone.utc),
+            },
+            {
+                "inventory_item_id": created_items[3].id,
+                "depot_id": created_items[3].depot_id,
+                "transaction_type": "receipt",
+                "quantity": 2000.0,
+                "unit_of_measure": "units",
+                "notes": "Bulk receipt from supplier",
+                "performed_at": datetime.now(timezone.utc),
+            },
+            {
+                "inventory_item_id": created_items[8].id,
+                "depot_id": created_items[8].depot_id,
+                "transaction_type": "consumption",
+                "quantity": -115.0,
+                "unit_of_measure": "kg",
+                "notes": "Damage and spoilage adjustment",
+                "performed_at": datetime.now(timezone.utc),
+            },
+        ]
+        
+        for txn_data in transactions:
+            transaction = InventoryTransaction(
+                id=uuid4(),
+                created_at=datetime.now(timezone.utc),
+                updated_at=datetime.now(timezone.utc),
+                **txn_data,
+            )
+            session.add(transaction)
+            logger.info(f"Created transaction: {txn_data['transaction_type']} for {txn_data['quantity']}")
+        
+        await session.commit()
+        logger.info(f"Sample inventory created: {len(inventory_items)} items, {len(transactions)} transactions")
+
+
 async def seed_database():
     """Main seed function."""
     logger.info("Starting database seeding...")
@@ -241,6 +469,7 @@ async def seed_database():
     await create_roles()
     await create_dev_users()
     await create_sample_depots()
+    await create_sample_inventory()
     
     logger.info("Database seeding completed successfully")
     logger.info("")
@@ -250,6 +479,11 @@ async def seed_database():
     logger.info("  - inventory@sangam.dev / inventory123! (Inventory Manager)")
     logger.info("  - analyst@sangam.dev / analyst123! (Analyst)")
     logger.info("  - viewer@sangam.dev / viewer123! (Viewer)")
+    logger.info("")
+    logger.info("Sample data created:")
+    logger.info("  - 3 depots (Mumbai, Delhi, Bangalore)")
+    logger.info("  - 9 inventory items across all depots")
+    logger.info("  - 4 sample transactions")
 
 
 if __name__ == "__main__":

@@ -208,14 +208,28 @@ class ApiClient {
    */
   async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { params?: Record<string, any> } = {}
   ): Promise<T> {
     // Check if token needs refresh
     if (this.isTokenExpired() && this.refreshToken) {
       await this.refreshAccessToken();
     }
 
-    const url = `${API_BASE_URL}${endpoint}`;
+    // Build URL with query parameters
+    let url = `${API_BASE_URL}${endpoint}`;
+    if (options.params) {
+      const searchParams = new URLSearchParams();
+      Object.entries(options.params).forEach(([key, value]) => {
+        if (value !== undefined && value !== null && value !== '') {
+          searchParams.append(key, String(value));
+        }
+      });
+      const queryString = searchParams.toString();
+      if (queryString) {
+        url += `?${queryString}`;
+      }
+    }
+
     const headers = {
       ...this.getAuthHeaders(),
       ...options.headers,
